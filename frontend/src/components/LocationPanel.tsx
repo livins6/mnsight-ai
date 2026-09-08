@@ -43,13 +43,13 @@ function FeatureBar({ name, value, max, color }: { name: string; value: number; 
 function Section({ title, icon, children, defaultOpen = true }: { title: string; icon: React.ReactNode; children: React.ReactNode; defaultOpen?: boolean }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div style={{ borderBottom: '1px solid #e8e8e8' }}>
+    <div style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
       <button
         onClick={() => setOpen(!open)}
         style={{
           width: '100%', display: 'flex', alignItems: 'center', gap: 8,
           padding: '10px 12px', background: 'none', border: 'none', cursor: 'pointer',
-          fontSize: 13, fontWeight: 700, color: '#333', textAlign: 'left',
+          fontSize: 13, fontWeight: 700, color: '#e8ecf5', textAlign: 'left',
         }}
       >
         {icon}
@@ -76,13 +76,18 @@ export default function LocationPanel({ data, onClose }: Props) {
   return (
     <div style={{
       position: 'absolute', top: 0, right: 0, width: 420, height: '100%',
-      background: '#fff', boxShadow: '-4px 0 20px rgba(0,0,0,0.15)',
+      background: 'rgba(8,14,26,0.92)',
+      backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)',
+      boxShadow: '-6px 0 40px rgba(0,0,0,0.5), inset -1px 0 0 rgba(255,255,255,0.08)',
       overflowY: 'auto', zIndex: 1000, fontFamily: 'system-ui, sans-serif',
+      color: '#e8ecf5',
+      borderRadius: '18px 0 0 18px',
     }}>
       {/* Header */}
       <div style={{
         background: 'linear-gradient(135deg, #1a237e 0%, #283593 100%)',
         color: '#fff', padding: '16px 16px 12px', position: 'relative',
+        borderBottom: '1px solid rgba(255,255,255,0.12)',
       }}>
         <button
           onClick={onClose}
@@ -122,7 +127,7 @@ export default function LocationPanel({ data, onClose }: Props) {
       </div>
 
       {/* Geological Context */}
-      <Section title="Geological Context" icon={<Layers size={14} color="#8B4513" />}>
+      <Section title="Geological Context" icon={<Layers size={14} color="#ffb74d" />}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, fontSize: 12 }}>
           <div><b>Formation:</b><br />{geological.formation}</div>
           <div><b>Rock Type:</b><br />{geological.rock_type}</div>
@@ -168,11 +173,11 @@ export default function LocationPanel({ data, onClose }: Props) {
       </Section>
 
       {/* AI Explanation */}
-      <Section title="🧠 AI Explanation (Why?)" icon={<Brain size={14} color="#6a1b9a" />}>
+      <Section title="🧠 AI Explanation (Why?)" icon={<Brain size={14} color="#ce93d8" />}>
         <div style={{ fontSize: 12, marginBottom: 8 }}>
           <div style={{
-            background: '#f3e5f5', padding: '8px 10px', borderRadius: 8,
-            fontSize: 11, color: '#4a148c', lineHeight: 1.5,
+            background: 'rgba(206,147,216,0.12)', padding: '8px 10px', borderRadius: 8,
+            fontSize: 11, color: '#ce93d8', lineHeight: 1.5,
           }}>
             The prospectivity score of <b>{(p.prospectivity_score * 100).toFixed(1)}%</b> is driven primarily by:
           </div>
@@ -180,7 +185,7 @@ export default function LocationPanel({ data, onClose }: Props) {
         {shap_top_features.slice(0, 8).map((f, i) => (
           <div key={i} style={{
             display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0',
-            borderBottom: '1px solid #f5f5f5', fontSize: 12,
+            borderBottom: '1px solid rgba(255,255,255,0.06)', fontSize: 12,
           }}>
             <div style={{
               width: 28, height: 28, borderRadius: '50%',
@@ -193,7 +198,7 @@ export default function LocationPanel({ data, onClose }: Props) {
             </div>
             <div style={{ flex: 1 }}>
               <div style={{ fontWeight: 600 }}>{f.feature_name}</div>
-              <div style={{ color: '#666', fontSize: 11 }}>{f.description}</div>
+              <div style={{ color: 'rgba(255,255,255,0.55)', fontSize: 11 }}>{f.description}</div>
             </div>
             <div style={{
               fontSize: 11, fontWeight: 700, color: f.direction === 'positive' ? '#2e7d32' : '#c62828',
@@ -208,7 +213,7 @@ export default function LocationPanel({ data, onClose }: Props) {
       <Section title="🎯 Recommendations" icon={<Lightbulb size={14} color="#f9a825" />}>
         {recommendations.map((rec, i) => (
           <div key={i} style={{
-            background: rec.priority === 'high' ? '#fff3e0' : rec.priority === 'medium' ? '#e3f2fd' : '#f5f5f5',
+            background: rec.priority === 'high' ? 'rgba(255,152,0,0.12)' : rec.priority === 'medium' ? 'rgba(79,195,247,0.1)' : 'rgba(255,255,255,0.05)',
             borderLeft: `3px solid ${rec.priority === 'high' ? '#e65100' : rec.priority === 'medium' ? '#1565c0' : '#9e9e9e'}`,
             padding: '8px 10px', borderRadius: '0 8px 8px 0', marginBottom: 8, fontSize: 12,
           }}>
@@ -220,7 +225,7 @@ export default function LocationPanel({ data, onClose }: Props) {
                 color: '#fff',
               }}>{rec.priority}</span>
             </div>
-            <div style={{ color: '#555', marginTop: 4 }}>{rec.rationale}</div>
+            <div style={{ color: 'rgba(255,255,255,0.6)', marginTop: 4 }}>{rec.rationale}</div>
             {rec.estimated_cost && (
               <div style={{ marginTop: 4, fontSize: 11 }}>
                 <b>Est. Cost:</b> {rec.estimated_cost} {rec.timeline && `| <b>Timeline:</b> ${rec.timeline}`}
@@ -231,8 +236,8 @@ export default function LocationPanel({ data, onClose }: Props) {
       </Section>
 
       {/* Data Provenance */}
-      <Section title="📋 Data Provenance" icon={<AlertTriangle size={14} color="#666" />} defaultOpen={false}>
-        <div style={{ fontSize: 11, color: '#555', lineHeight: 1.6 }}>
+      <Section title="📋 Data Provenance" icon={<AlertTriangle size={14} color="#90a4ae" />} defaultOpen={false}>
+        <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', lineHeight: 1.6 }}>
           {Object.entries(data.data_provenance).map(([key, val]) => (
             <div key={key} style={{ marginBottom: 4 }}>
               <b>{key}:</b> {val}
@@ -243,8 +248,8 @@ export default function LocationPanel({ data, onClose }: Props) {
 
       {/* Model disclaimer */}
       <div style={{
-        padding: '12px', background: '#fff8e1', borderTop: '1px solid #ffe082',
-        fontSize: 11, color: '#795548', lineHeight: 1.5,
+        padding: '12px', background: 'rgba(255,152,0,0.1)', borderTop: '1px solid rgba(255,152,0,0.25)',
+        fontSize: 11, color: '#ffcc80', lineHeight: 1.5,
       }}>
         <AlertTriangle size={12} style={{ verticalAlign: 'middle', marginRight: 4 }} />
         <b>Scientific Disclaimer:</b> This is AI-assisted <b>manganese prospectivity / resource potential</b>.

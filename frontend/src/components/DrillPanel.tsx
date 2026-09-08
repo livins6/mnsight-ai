@@ -18,8 +18,9 @@ export default function DrillPanel({ onSelectCandidate }: Props) {
 
   return (
     <div style={{
-      background: '#fff', borderRadius: 12, boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
-      overflow: 'hidden', fontFamily: 'system-ui, sans-serif',
+      background: 'rgba(10,18,32,0.85)', borderRadius: 12, boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+      overflow: 'hidden', fontFamily: 'system-ui, sans-serif', color: '#e8ecf5',
+      border: '1px solid rgba(255,255,255,0.1)',
     }}>
       {/* Header */}
       <div style={{
@@ -39,7 +40,7 @@ export default function DrillPanel({ onSelectCandidate }: Props) {
         {/* Search */}
         <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
           <div style={{ flex: 1 }}>
-            <label style={{ fontSize: 11, color: '#888' }}>Center Lat</label>
+            <label style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>Center Lat</label>
             <input
               type="number" step="0.01" value={centerLat}
               onChange={(e) => setCenterLat(e.target.value)}
@@ -50,7 +51,7 @@ export default function DrillPanel({ onSelectCandidate }: Props) {
             />
           </div>
           <div style={{ flex: 1 }}>
-            <label style={{ fontSize: 11, color: '#888' }}>Center Lon</label>
+            <label style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>Center Lon</label>
             <input
               type="number" step="0.01" value={centerLon}
               onChange={(e) => setCenterLon(e.target.value)}
@@ -82,18 +83,18 @@ export default function DrillPanel({ onSelectCandidate }: Props) {
                 onClick={() => onSelectCandidate(c.latitude, c.longitude)}
                 style={{
                   display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px',
-                  border: '1px solid #eee', borderRadius: 10, marginBottom: 8,
+                  border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, marginBottom: 8,
                   cursor: 'pointer', transition: 'all 0.2s',
-                  background: c.rank <= 3 ? '#fff8e1' : '#fff',
+                  background: c.rank <= 3 ? 'rgba(255,152,0,0.1)' : 'rgba(255,255,255,0.04)',
                 }}
                 onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#e65100'; e.currentTarget.style.background = '#fff3e0'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#eee'; e.currentTarget.style.background = c.rank <= 3 ? '#fff8e1' : '#fff'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.background = c.rank <= 3 ? 'rgba(255,152,0,0.1)' : 'rgba(255,255,255,0.04)'; }}
               >
                 {/* Rank badge */}
                 <div style={{
                   width: 32, height: 32, borderRadius: '50%',
-                  background: c.rank <= 3 ? 'linear-gradient(135deg, #e65100, #f57c00)' : '#e0e0e0',
-                  color: c.rank <= 3 ? '#fff' : '#555',
+                  background: c.rank <= 3 ? 'linear-gradient(135deg, #e65100, #f57c00)' : 'rgba(255,255,255,0.15)',
+                  color: c.rank <= 3 ? '#fff' : 'rgba(255,255,255,0.6)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   fontWeight: 800, fontSize: 13, flexShrink: 0,
                 }}>
@@ -114,10 +115,10 @@ export default function DrillPanel({ onSelectCandidate }: Props) {
                       {(c.confidence * 100).toFixed(0)}% conf.
                     </span>
                   </div>
-                  <div style={{ fontSize: 11, color: '#666', marginTop: 2, lineHeight: 1.3 }}>
+                  <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)', marginTop: 2, lineHeight: 1.3 }}>
                     {c.priority_reason}
                   </div>
-                  <div style={{ fontSize: 10, color: '#999', marginTop: 2 }}>
+                  <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>
                     {c.latitude.toFixed(4)}°N, {c.longitude.toFixed(4)}°E
                   </div>
                 </div>
@@ -129,7 +130,7 @@ export default function DrillPanel({ onSelectCandidate }: Props) {
         )}
 
         {candidates.length === 0 && !loading && (
-          <div style={{ padding: 24, textAlign: 'center', color: '#999', fontSize: 13 }}>
+          <div style={{ padding: 24, textAlign: 'center', color: 'rgba(255,255,255,0.4)', fontSize: 13 }}>
             Set a center point and click "Rank" to find the best drill locations.
           </div>
         )}

@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from typing import Optional, List, Dict, Any
 import math
+import httpx
 
 from .models import (
     LocationRequest, LocationIntelligence, SpectralFeatures,
@@ -49,6 +50,59 @@ app.add_middleware(
 @app.get("/api/health")
 async def health_check():
     return {"status": "healthy", "service": "MnSight AI", "version": "1.0.0"}
+
+
+# ── Geocoding (Nominatim fallback) ─────────────────────────────
+
+@app.get("/api/geocode")
+async def geocode_place(
+    q: str = Query(..., min_length=2, max_length=200, description="Place name to geocode"),
+    limit: int = Query(default=5, ge=1, le=10),
+):
+    """
+    Geocode a free-text place name via OpenStreetMap Nominatim.
+    Used by the search box when a query matches no mine/district/occurrence.
+    """
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            resp = await client.get(
+                "https://nominatim.openstreetmap.org/search",
+                params={
+                    "q": q,
+                    "format": "jsonv2",
+                    "limit": limit,
+                    "addressdetails": 0,
+                    "accept-language": "en",
+                },
+                headers={
+                    "User-Agent": "MnSightAI/1.0 (SIH 26009 mining-intelligence demo)",
+                },
+            )
+            resp.raise_for_status()
+            items = resp.json()
+    except Exception as exc:
+        # Geocoder unreachable — degrade gracefully rather than crash the search UI.
+        raise HTTPException(status_code=502, detail=f"Geocoding service unavailable: {exc}")
+
+    results = []
+    for it in items or []:
+        try:
+            lat = float(it["lat"])
+            lon = float(it["lon"])
+        except (KeyError, ValueError, TypeError):
+            continue
+        bb = it.get("boundingbox") or []
+        results.append({
+            "place_id": it.get("place_id"),
+            "display_name": it.get("display_name", ""),
+            "lat": lat,
+            "lon": lon,
+            "type": it.get("type", ""),
+            "class": it.get("class", ""),
+            # boundingbox = [south, north, west, east] as strings from Nominatim
+            "boundingbox": [float(x) for x in bb] if len(bb) == 4 else None,
+        })
+    return {"results": results}
 
 
 # ── Location Intelligence ──────────────────────────────────────

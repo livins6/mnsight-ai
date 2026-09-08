@@ -31,7 +31,7 @@ MANGANESE_OCCURRENCES: List[Dict[str, Any]] = [
      "host_rock": "Rhodonite-bearing Quartzite", "mineralization_type": "oxide", "grade_info": "28-42% MnO"},
 
     # Maharashtra — Nagpur Belt
-    {"id": 6, "name": "YNagpur East", "latitude": 21.1450, "longitude": 79.1200,
+    {"id": 6, "name": "Nagpur East", "latitude": 21.1450, "longitude": 79.1200,
      "state": "Maharashtra", "district": "Nagpur", "formation": "Bhandara Fm",
      "host_rock": "Manganiferous Dolomite", "mineralization_type": "carbonate", "grade_info": "25-38% MnO"},
     {"id": 7, "name": "Bhiwapur Deposit", "latitude": 21.3200, "longitude": 79.4500,
@@ -86,42 +86,107 @@ MANGANESE_OCCURRENCES: List[Dict[str, Any]] = [
     {"id": 20, "name": "Seoni Deposit", "latitude": 22.0800, "longitude": 79.5500,
      "state": "Madhya Pradesh", "district": "Seoni", "formation": "Sausar Fm",
      "host_rock": "Braunite-bearing Quartzite", "mineralization_type": "oxide", "grade_info": "30-45% MnO"},
+
+    # Odisha — Keonjhar & Bonai belts
+    {"id": 21, "name": "Barbil Deposit", "latitude": 22.1100, "longitude": 85.3800,
+     "state": "Odisha", "district": "Keonjhar", "formation": "Iron Ore Group",
+     "host_rock": "Manganiferous BIF", "mineralization_type": "oxide", "grade_info": "25-40% MnO"},
+    {"id": 22, "name": "Joda Deposit", "latitude": 22.0300, "longitude": 85.4300,
+     "state": "Odisha", "district": "Keonjhar", "formation": "Iron Ore Group",
+     "host_rock": "Manganiferous Shale", "mineralization_type": "oxide", "grade_info": "22-38% MnO"},
+    {"id": 23, "name": "Bonai Deposit", "latitude": 21.9600, "longitude": 85.1000,
+     "state": "Odisha", "district": "Sundargarh", "formation": "Iron Ore Group",
+     "host_rock": "Manganiferous Quartzite", "mineralization_type": "oxide", "grade_info": "28-45% MnO"},
+    {"id": 24, "name": "Rayagada Deposit", "latitude": 19.1600, "longitude": 83.4200,
+     "state": "Odisha", "district": "Rayagada", "formation": "Eastern Ghats Belt",
+     "host_rock": "Manganiferous Khondalite", "mineralization_type": "oxide", "grade_info": "20-35% MnO"},
+
+    # Andhra Pradesh — Srikakulam–Vizianagaram belt (Kodur–Garividi)
+    {"id": 25, "name": "Garividi Deposit", "latitude": 18.2900, "longitude": 83.5300,
+     "state": "Andhra Pradesh", "district": "Vizianagaram", "formation": "Eastern Ghats Belt",
+     "host_rock": "Manganiferous Khondalite", "mineralization_type": "oxide", "grade_info": "30-48% MnO"},
+    {"id": 26, "name": "Koduru Deposit", "latitude": 18.2500, "longitude": 83.4800,
+     "state": "Andhra Pradesh", "district": "Srikakulam", "formation": "Eastern Ghats Belt",
+     "host_rock": "Braunite-bearing Schist", "mineralization_type": "oxide", "grade_info": "28-45% MnO"},
+    {"id": 27, "name": "Garbham Deposit", "latitude": 18.2600, "longitude": 83.6100,
+     "state": "Andhra Pradesh", "district": "Vizianagaram", "formation": "Eastern Ghats Belt",
+     "host_rock": "Manganiferous Quartzite", "mineralization_type": "oxide", "grade_info": "25-40% MnO"},
+
+    # Karnataka — Sandur, Shimoga, Chitradurga belts
+    {"id": 28, "name": "Sandur Deposit", "latitude": 15.0900, "longitude": 76.5400,
+     "state": "Karnataka", "district": "Bellary", "formation": "Dharwar Fm",
+     "host_rock": "Manganiferous Chert", "mineralization_type": "oxide", "grade_info": "28-42% MnO"},
+    {"id": 29, "name": "Shimoga Deposit", "latitude": 13.9300, "longitude": 75.5700,
+     "state": "Karnataka", "district": "Shimoga", "formation": "Dharwar Fm",
+     "host_rock": "Manganiferous Schist", "mineralization_type": "oxide", "grade_info": "25-38% MnO"},
+    {"id": 30, "name": "Chitradurga Deposit", "latitude": 14.2300, "longitude": 76.4000,
+     "state": "Karnataka", "district": "Chitradurga", "formation": "Dharwar Fm",
+     "host_rock": "Braunite-bearing Quartzite", "mineralization_type": "oxide", "grade_info": "30-45% MnO"},
+
+    # Gujarat — Panchmahal belt
+    {"id": 31, "name": "Chhota Udepur Deposit", "latitude": 22.3000, "longitude": 74.0200,
+     "state": "Gujarat", "district": "Chhota Udepur", "formation": "Aravalli Fm",
+     "host_rock": "Manganiferous Phyllite", "mineralization_type": "oxide", "grade_info": "22-35% MnO"},
+
+    # Rajasthan — Banswara belt
+    {"id": 32, "name": "Banswara Deposit", "latitude": 23.5400, "longitude": 74.4400,
+     "state": "Rajasthan", "district": "Banswara", "formation": "Aravalli Fm",
+     "host_rock": "Manganiferous Quartzite", "mineralization_type": "oxide", "grade_info": "25-40% MnO"},
+
+    # Jharkhand — Singhbhum belt
+    {"id": 33, "name": "Noamundi Deposit", "latitude": 22.1400, "longitude": 85.5100,
+     "state": "Jharkhand", "district": "West Singhbhum", "formation": "Iron Ore Group",
+     "host_rock": "Manganiferous BIF", "mineralization_type": "oxide", "grade_info": "25-42% MnO"},
+
+    # West Bengal — Purulia belt
+    {"id": 34, "name": "Purulia Deposit", "latitude": 23.3300, "longitude": 86.3600,
+     "state": "West Bengal", "district": "Purulia", "formation": "Singhbhum Group",
+     "host_rock": "Manganiferous Schist", "mineralization_type": "oxide", "grade_info": "22-38% MnO"},
+
+    # Goa — minor Mn in laterite
+    {"id": 35, "name": "Sanguem Deposit", "latitude": 15.2300, "longitude": 74.1600,
+     "state": "Goa", "district": "South Goa", "formation": "Lateritic",
+     "host_rock": "Lateritic Manganese Ore", "mineralization_type": "oxide", "grade_info": "15-30% MnO"},
 ]
 
 # ── MOIL Mine Locations ────────────────────────────────────────
 # MOIL Limited operates the largest manganese mines in India
 
 MOIL_MINES: List[Dict[str, Any]] = [
-    {"id": 1, "name": "Dongri Buzurg Mine", "latitude": 21.7900, "longitude": 80.1800,
+    # Real MOIL mine list (MOIL operates 10 mines in Maharashtra & Madhya Pradesh)
+    # 7 underground: Kandri, Munsar, Beldongri, Gumgaon, Chikla, Balaghat, Ukwa
+    # 3 opencast: Dongri Buzurg, Sitapatore, Tirodi
+    {"id": 1, "name": "Balaghat Mine", "latitude": 21.8039, "longitude": 80.1832,
      "state": "Madhya Pradesh", "district": "Balaghat", "operator": "MOIL Ltd",
-     "status": "active", "mineral": "Manganese"},
-    {"id": 2, "name": "Munsur Buzurg Mine", "latitude": 21.8200, "longitude": 80.2800,
+     "status": "active", "mineral": "Manganese", "type": "underground",
+     "note": "Deepest manganese mine in Asia (383m); largest single MOIL mine"},
+    {"id": 2, "name": "Tirodi Mine", "latitude": 21.6801, "longitude": 79.7167,
      "state": "Madhya Pradesh", "district": "Balaghat", "operator": "MOIL Ltd",
-     "status": "active", "mineral": "Manganese"},
-    {"id": 3, "name": "Kandri Mine", "latitude": 21.6900, "longitude": 80.1200,
+     "status": "active", "mineral": "Manganese", "type": "opencast"},
+    {"id": 3, "name": "Ukwa Mine", "latitude": 21.9708, "longitude": 80.4666,
      "state": "Madhya Pradesh", "district": "Balaghat", "operator": "MOIL Ltd",
-     "status": "active", "mineral": "Manganese"},
-    {"id": 4, "name": "Kosmi Mine", "latitude": 21.9000, "longitude": 80.0600,
-     "state": "Madhya Pradesh", "district": "Balaghat", "operator": "MOIL Ltd",
-     "status": "active", "mineral": "Manganese"},
-    {"id": 5, "name": "Shahi Mine", "latitude": 21.7500, "longitude": 80.2200,
-     "state": "Madhya Pradesh", "district": "Balaghat", "operator": "MOIL Ltd",
-     "status": "active", "mineral": "Manganese"},
-    {"id": 6, "name": "Tirodi Mine", "latitude": 21.2200, "longitude": 79.2100,
-     "state": "Maharashtra", "district": "Balaghat", "operator": "MOIL Ltd",
-     "status": "active", "mineral": "Manganese"},
-    {"id": 7, "name": "Jagannathpur Mine", "latitude": 21.2500, "longitude": 79.3500,
+     "status": "active", "mineral": "Manganese", "type": "underground"},
+    {"id": 4, "name": "Kandri Mine", "latitude": 21.4205, "longitude": 79.2764,
      "state": "Maharashtra", "district": "Nagpur", "operator": "MOIL Ltd",
-     "status": "active", "mineral": "Manganese"},
-    {"id": 8, "name": "Chikla Mine", "latitude": 21.3100, "longitude": 79.3400,
+     "status": "active", "mineral": "Manganese", "type": "underground"},
+    {"id": 5, "name": "Munsar Mine", "latitude": 21.3981, "longitude": 79.2795,
      "state": "Maharashtra", "district": "Nagpur", "operator": "MOIL Ltd",
-     "status": "active", "mineral": "Manganese"},
-    {"id": 9, "name": "Balaghat Mine", "latitude": 21.8039, "longitude": 80.1832,
-     "state": "Madhya Pradesh", "district": "Balaghat", "operator": "MOIL Ltd",
-     "status": "active", "mineral": "Manganese"},
-    {"id": 10, "name": "Witdongri Mine", "latitude": 21.7700, "longitude": 80.1500,
-     "state": "Madhya Pradesh", "district": "Balaghat", "operator": "MOIL Ltd",
-     "status": "active", "mineral": "Manganese"},
+     "status": "active", "mineral": "Manganese", "type": "underground"},
+    {"id": 6, "name": "Beldongri Mine", "latitude": 21.0900, "longitude": 79.0400,
+     "state": "Maharashtra", "district": "Nagpur", "operator": "MOIL Ltd",
+     "status": "active", "mineral": "Manganese", "type": "underground"},
+    {"id": 7, "name": "Gumgaon Mine", "latitude": 20.9889, "longitude": 79.0303,
+     "state": "Maharashtra", "district": "Nagpur", "operator": "MOIL Ltd",
+     "status": "active", "mineral": "Manganese", "type": "underground"},
+    {"id": 8, "name": "Chikla Mine", "latitude": 21.5330, "longitude": 79.7428,
+     "state": "Maharashtra", "district": "Bhandara", "operator": "MOIL Ltd",
+     "status": "active", "mineral": "Manganese", "type": "underground"},
+    {"id": 9, "name": "Dongri Buzurg Mine", "latitude": 21.5502, "longitude": 79.6940,
+     "state": "Maharashtra", "district": "Bhandara", "operator": "MOIL Ltd",
+     "status": "active", "mineral": "Manganese", "type": "opencast"},
+    {"id": 10, "name": "Sitapatore Mine", "latitude": 21.5900, "longitude": 79.7200,
+     "state": "Maharashtra", "district": "Bhandara", "operator": "MOIL Ltd",
+     "status": "active", "mineral": "Manganese", "type": "opencast"},
 ]
 
 # ── Geological Formations in the Mn Belt ───────────────────────
@@ -174,6 +239,38 @@ GEOLOGICAL_FORMATIONS = {
         "lithology": ["Gneiss", "Granite", "Amphibolite", "Greenstone"],
         "mn_prospectivity": 0.45,
         "color": "#4A4A4A",
+    },
+    "Eastern Ghats Belt": {
+        "name": "Eastern Ghats Mobile Belt",
+        "age": "Proterozoic",
+        "description": "Khondalite-charnockite suite hosting Mn in Odisha-AP coastal belt",
+        "lithology": ["Khondalite", "Quartzite", "Gondite", "Calc-silicate"],
+        "mn_prospectivity": 0.62,
+        "color": "#6B8E23",
+    },
+    "Dharwar Fm": {
+        "name": "Dharwar Supergroup",
+        "age": "Archaean-Palaeoproterozoic",
+        "description": "Schist belts of Karnataka hosting Mn in Sandur-Shimoga-Chitradurga",
+        "lithology": ["Schist", "Chert", "Quartzite", "Volcanics"],
+        "mn_prospectivity": 0.58,
+        "color": "#556B2F",
+    },
+    "Aravalli Fm": {
+        "name": "Aravalli Supergroup",
+        "age": "Palaeoproterozoic",
+        "description": "Metasedimentary belt of Rajasthan-Gujarat with Mn in Banswara belt",
+        "lithology": ["Phyllite", "Quartzite", "Carbonate", "Schist"],
+        "mn_prospectivity": 0.50,
+        "color": "#8B7355",
+    },
+    "Singhbhum Group": {
+        "name": "Singhbhum Group",
+        "age": "Archaean",
+        "description": "Metasedimentary suite of Jharkhand-West Bengal with Mn occurrences",
+        "lithology": ["Schist", "Quartzite", "BIF", "Phyllite"],
+        "mn_prospectivity": 0.52,
+        "color": "#7B5B3A",
     },
 }
 
@@ -287,12 +384,24 @@ def get_geological_formation(lat: float, lon: float) -> str:
     # Nagpur-Bhandara belt
     elif 20.5 <= lat <= 21.5 and 79.0 <= lon <= 80.0:
         return "Bhandara Fm"
-    # Lateritic cover on the west coast
-    elif 16.0 <= lat <= 18.0 and 73.0 <= lon <= 74.0:
+    # Lateritic cover on the west coast (Goa, Ratnagiri)
+    elif 14.5 <= lat <= 18.0 and 73.0 <= lon <= 74.5:
         return "Lateritic"
-    # Keonjhar area
-    elif 21.0 <= lat <= 22.5 and 84.5 <= lon <= 86.0:
+    # Keonjhar-Bonai-Singhbhum iron-manganese belts
+    elif 21.0 <= lat <= 23.0 and 84.5 <= lon <= 86.5:
         return "Iron Ore Group"
+    # Eastern Ghats belt (Srikakulam-Vizianagaram, Rayagada)
+    elif 17.5 <= lat <= 20.5 and 83.0 <= lon <= 84.5:
+        return "Eastern Ghats Belt"
+    # Dharwar schist belts of Karnataka
+    elif 12.5 <= lat <= 16.0 and 74.5 <= lon <= 77.5:
+        return "Dharwar Fm"
+    # Aravalli belt (Rajasthan-Gujarat)
+    elif 23.0 <= lat <= 26.0 and 72.5 <= lon <= 75.0:
+        return "Aravalli Fm"
+    # Purulia
+    elif 22.5 <= lat <= 23.5 and 86.0 <= lon <= 86.8:
+        return "Singhbhum Group"
     # Gondwana basins
     elif 22.0 <= lat <= 23.5 and 78.0 <= lon <= 80.0:
         return "Gondwana"

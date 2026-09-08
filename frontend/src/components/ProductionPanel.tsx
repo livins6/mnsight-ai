@@ -5,13 +5,14 @@ import { BarChart3, TrendingDown, AlertTriangle, CheckCircle, ChevronDown, Chevr
 import type { ProductionForecast } from '../types';
 
 const MINE_NAMES = [
-  'Dongri Buzurg Mine', 'Munsur Buzurg Mine', 'Kandri Mine', 'Kosmi Mine',
-  'Shahi Mine', 'Tirodi Mine', 'Jagannathpur Mine', 'Chikla Mine',
-  'Balaghat Mine', 'Witdongri Mine',
+  'Balaghat Mine', 'Tirodi Mine', 'Ukwa Mine', 'Kandri Mine', 'Munsar Mine',
+  'Beldongri Mine', 'Gumgaon Mine', 'Chikla Mine', 'Dongri Buzurg Mine', 'Sitapatore Mine',
 ];
 
 interface Props {
   onDrillHere?: () => void;
+  mine?: string;
+  onMineChange?: (mine: string) => void;
 }
 
 function RiskBadge({ level }: { level: string }) {
@@ -30,14 +31,21 @@ function RiskBadge({ level }: { level: string }) {
   );
 }
 
-export default function ProductionPanel({ onDrillHere }: Props) {
-  const [selectedMine, setSelectedMine] = useState('Dongri Buzurg Mine');
+export default function ProductionPanel({ onDrillHere, mine, onMineChange }: Props) {
+  const [selectedMine, setSelectedMine] = useState('Balaghat Mine');
   const [monthsAhead, setMonthsAhead] = useState(6);
   const { forecasts, loading, fetchForecast } = useProductionForecast();
   const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
 
+  // Sync with externally-controlled mine selection (shared with timeline strip)
+  const effectiveMine = mine ?? selectedMine;
+  const changeMine = (name: string) => {
+    if (onMineChange) onMineChange(name);
+    setSelectedMine(name);
+  };
+
   const handleFetch = () => {
-    fetchForecast(selectedMine, monthsAhead);
+    fetchForecast(effectiveMine, monthsAhead);
   };
 
   // Transform for chart
@@ -54,8 +62,9 @@ export default function ProductionPanel({ onDrillHere }: Props) {
 
   return (
     <div style={{
-      background: '#fff', borderRadius: 12, boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
-      overflow: 'hidden', fontFamily: 'system-ui, sans-serif',
+      background: 'rgba(10,18,32,0.85)', borderRadius: 12, boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+      overflow: 'hidden', fontFamily: 'system-ui, sans-serif', color: '#e8ecf5',
+      border: '1px solid rgba(255,255,255,0.1)',
     }}>
       {/* Header */}
       <div style={{
@@ -70,8 +79,8 @@ export default function ProductionPanel({ onDrillHere }: Props) {
           <div style={{ flex: 1 }}>
             <label style={{ fontSize: 11, opacity: 0.8 }}>Mine</label>
             <select
-              value={selectedMine}
-              onChange={(e) => setSelectedMine(e.target.value)}
+              value={effectiveMine}
+              onChange={(e) => changeMine(e.target.value)}
               style={{
                 width: '100%', padding: '6px 8px', borderRadius: 6, border: '1px solid rgba(255,255,255,0.3)',
                 background: 'rgba(255,255,255,0.15)', color: '#fff', fontSize: 12,
@@ -112,17 +121,17 @@ export default function ProductionPanel({ onDrillHere }: Props) {
           {/* Risk Summary */}
           <div style={{
             display: 'flex', gap: 12, padding: '12px 16px',
-            background: avgRisk > 0.15 ? '#fff3e0' : avgRisk > 0.08 ? '#fffde7' : '#e8f5e9',
-            borderBottom: '1px solid #e0e0e0',
+            background: avgRisk > 0.15 ? 'rgba(255,152,0,0.1)' : avgRisk > 0.08 ? 'rgba(255,193,7,0.08)' : 'rgba(76,175,80,0.08)',
+            borderBottom: '1px solid rgba(255,255,255,0.08)',
           }}>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 11, color: '#666' }}>Avg Shortfall Risk</div>
+              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)' }}>Avg Shortfall Risk</div>
               <div style={{ fontSize: 22, fontWeight: 700, color: avgRisk > 0.15 ? '#e65100' : avgRisk > 0.08 ? '#f57f17' : '#2e7d32' }}>
                 {(avgRisk * 100).toFixed(0)}%
               </div>
             </div>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 11, color: '#666' }}>Period</div>
+              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)' }}>Period</div>
               <div style={{ fontSize: 16, fontWeight: 600 }}>{forecasts[0]?.month} → {forecasts[forecasts.length - 1]?.month}</div>
             </div>
             <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -132,7 +141,7 @@ export default function ProductionPanel({ onDrillHere }: Props) {
 
           {/* Chart */}
           {chartData.length > 0 && (
-            <div style={{ padding: '12px 16px', borderBottom: '1px solid #e8e8e8' }}>
+            <div style={{ padding: '12px 16px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
               <ResponsiveContainer width="100%" height={200}>
                 <AreaChart data={chartData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
@@ -155,17 +164,16 @@ export default function ProductionPanel({ onDrillHere }: Props) {
               <div
                 key={i}
                 style={{
-                  padding: '10px 16px', borderBottom: '1px solid #f0f0f0',
+                  padding: '10px 16px', borderBottom: '1px solid rgba(255,255,255,0.06)',
                   cursor: 'pointer', transition: 'background 0.2s',
                 }}
                 onClick={() => setExpandedIdx(expandedIdx === i ? null : i)}
-                onMouseEnter={(e) => (e.currentTarget.style.background = '#f8f8f8')}
-                onMouseLeave={(e) => (e.currentTarget.style.background = '#fff')}
+                onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.06)')}
+                onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div>
-                    <span style={{ fontWeight: 600, fontSize: 13 }}>{f.month}</span>
-                    <span style={{ fontSize: 12, color: '#666', marginLeft: 8 }}>
+                    <span style={{ fontWeight: 600, fontSize: 13 }}>{f.month}</span>                      <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', marginLeft: 8 }}>
                       {Math.round(f.predicted_tonnes / 1000)}kt / {Math.round(f.predicted_target / 1000)}kt
                     </span>
                   </div>
@@ -176,7 +184,7 @@ export default function ProductionPanel({ onDrillHere }: Props) {
                 </div>
 
                 {expandedIdx === i && (
-                  <div style={{ marginTop: 8, padding: '8px 10px', background: '#fafafa', borderRadius: 8, fontSize: 12 }}>
+                  <div style={{ marginTop: 8, padding: '8px 10px', background: 'rgba(255,255,255,0.05)', borderRadius: 8, fontSize: 12 }}>
                     <div style={{ marginBottom: 6 }}>
                       <b>Contributing Factors:</b>
                       {f.contributing_factors.map((cf: any, j: number) => (
@@ -202,7 +210,7 @@ export default function ProductionPanel({ onDrillHere }: Props) {
       )}
 
       {forecasts.length === 0 && !loading && (
-        <div style={{ padding: 32, textAlign: 'center', color: '#999', fontSize: 13 }}>
+        <div style={{ padding: 32, textAlign: 'center', color: 'rgba(255,255,255,0.4)', fontSize: 13 }}>
           Select a mine and click "Forecast" to see production predictions.
         </div>
       )}

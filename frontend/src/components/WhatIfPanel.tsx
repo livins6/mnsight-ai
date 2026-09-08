@@ -22,8 +22,9 @@ export default function WhatIfPanel() {
 
   return (
     <div style={{
-      background: '#fff', borderRadius: 12, boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
-      overflow: 'hidden', fontFamily: 'system-ui, sans-serif',
+      background: 'rgba(10,18,32,0.85)', borderRadius: 12, boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+      overflow: 'hidden', fontFamily: 'system-ui, sans-serif', color: '#e8ecf5',
+      border: '1px solid rgba(255,255,255,0.1)',
     }}>
       {/* Header */}
       <div style={{
@@ -47,9 +48,9 @@ export default function WhatIfPanel() {
                 onClick={() => update('rainfall_scenario', s)}
                 style={{
                   flex: 1, padding: '6px 4px', borderRadius: 6, border: '2px solid',
-                  borderColor: params.rainfall_scenario === s ? '#7b1fa2' : '#e0e0e0',
-                  background: params.rainfall_scenario === s ? '#f3e5f5' : '#fff',
-                  color: params.rainfall_scenario === s ? '#4a148c' : '#555',
+                  borderColor: params.rainfall_scenario === s ? '#ab47bc' : 'rgba(255,255,255,0.15)',
+                  background: params.rainfall_scenario === s ? 'rgba(171,71,188,0.2)' : 'rgba(255,255,255,0.04)',
+                  color: params.rainfall_scenario === s ? '#ce93d8' : 'rgba(255,255,255,0.6)',
                   fontWeight: params.rainfall_scenario === s ? 700 : 400,
                   fontSize: 11, cursor: 'pointer', transition: 'all 0.2s',
                 }}
@@ -148,20 +149,20 @@ export default function WhatIfPanel() {
 
         {/* Results */}
         {result && (
-          <div style={{ marginTop: 16, padding: 14, background: '#f3e5f5', borderRadius: 10 }}>
+          <div style={{ marginTop: 16, padding: 14, background: 'rgba(171,71,188,0.1)', borderRadius: 10, border: '1px solid rgba(171,71,188,0.25)' }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: '#4a148c', marginBottom: 10 }}>
               Simulation Results
             </div>
 
             <div style={{ display: 'flex', gap: 10, marginBottom: 12 }}>
-              <div style={{ flex: 1, textAlign: 'center', padding: 8, background: '#fff', borderRadius: 8 }}>
+              <div style={{ flex: 1, textAlign: 'center', padding: 8, background: 'rgba(255,255,255,0.06)', borderRadius: 8 }}>
                 <div style={{ fontSize: 10, color: '#888' }}>BASE</div>
                 <div style={{ fontSize: 18, fontWeight: 700 }}>{Math.round(result.base_predicted / 1000)}kt</div>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', color: '#7b1fa2' }}>
                 <ArrowRight size={18} />
               </div>
-              <div style={{ flex: 1, textAlign: 'center', padding: 8, background: '#fff', borderRadius: 8 }}>
+              <div style={{ flex: 1, textAlign: 'center', padding: 8, background: 'rgba(255,255,255,0.06)', borderRadius: 8 }}>
                 <div style={{ fontSize: 10, color: '#888' }}>SCENARIO</div>
                 <div style={{ fontSize: 18, fontWeight: 700, color: result.impact_on_production >= 0 ? '#2e7d32' : '#c62828' }}>
                   {Math.round(result.scenario_predicted / 1000)}kt
@@ -181,7 +182,7 @@ export default function WhatIfPanel() {
               </span>
             </div>
 
-            <div style={{ fontSize: 11, color: '#555', marginBottom: 8 }}>
+            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', marginBottom: 8 }}>
               <b>Shortfall Risk:</b> {((result.impact_on_shortfall_risk) > 0 ? 'Increased by ' : 'Decreased by ')
                 }{Math.abs(result.impact_on_shortfall_risk * 100).toFixed(1)}%
             </div>
@@ -190,7 +191,7 @@ export default function WhatIfPanel() {
               <div style={{ marginTop: 8 }}>
                 <div style={{ fontSize: 11, fontWeight: 700, color: '#4a148c', marginBottom: 4 }}>Recommendations:</div>
                 {result.recommendations.map((r, i) => (
-                  <div key={i} style={{ fontSize: 11, color: '#555', marginBottom: 2 }}>→ {r}</div>
+                  <div key={i} style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', marginBottom: 2 }}>→ {r}</div>
                 ))}
               </div>
             )}

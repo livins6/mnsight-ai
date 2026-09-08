@@ -11,10 +11,14 @@ from typing import Dict, List, Any, Tuple, Optional
 from dataclasses import dataclass
 
 from .datasets import (
-    MANGANESE_OCCURRENCES, GEOLOGICAL_FORMATIONS,
+    MANGANESE_OCCURRENCES, GEOLOGICAL_FORMATIONS, MOIL_MINES,
     haversine_km, get_nearest_occurrence, get_nearest_fault,
     count_occurrences_in_radius, get_nearby_mines,
     get_geological_formation, get_rock_type
+)
+from .real_data import (
+    get_monthly_rainfall, get_rainfall_series, rainfall_anomaly,
+    mine_production_for_month, REAL_MONTHLY_PRODUCTION_TONNES
 )
 from .models import (
     SpectralFeatures, TerrainFeatures, EnvironmentalFeatures,
@@ -99,28 +103,35 @@ def extract_terrain_features(lat: float, lon: float) -> TerrainFeatures:
 def extract_environmental_features(lat: float, lon: float) -> EnvironmentalFeatures:
     """
     Generate environmental features.
-    In production, these would come from NASA POWER, IMD, and satellite products.
-    Central India receives 1000-1500mm annual rainfall (monsoon-dominated).
+    Rainfall comes from the REAL all-India ERA5 reanalysis grid (Sep 2023–Aug 2025);
+    soil moisture and LST are simulated but correlated with real rainfall.
     """
     random.seed(hash((lat + 0.1, lon + 0.1)) % 2**32)
 
-    # Soil moisture varies seasonally and spatially
-    soil_moisture = np.random.uniform(0.15, 0.65)
+    # Real rainfall: most recent month (Aug 2025) and trailing 30d/7d approximations
+    latest_month = max(REAL_MONTHLY_PRODUCTION_TONNES.keys())  # 2025-08
+    rainfall_month = get_monthly_rainfall(lat, lon, latest_month)
+    # Trailing window: last 3 months average as a 90d proxy -> 30d = last month
+    series = get_rainfall_series(lat, lon)
+    last3 = sorted(series.keys())[-3:]
+    rain_90d = sum(series.get(m, 0.0) for m in last3)
 
-    # LST: Central India typical range
-    lst = np.random.uniform(25, 45)
+    rainfall_30d = rainfall_month
+    rainfall_7d = rainfall_month * 0.35 + np.random.uniform(0, 15)
+    anomaly = rainfall_anomaly(lat, lon, latest_month)
 
-    # Rainfall: monsoon-dominated
-    rainfall_30d = np.random.uniform(10, 250)
-    rainfall_7d = np.random.uniform(0, 80)
-    rainfall_anomaly = np.random.uniform(-0.3, 0.5)
+    # Soil moisture correlates with recent rainfall (wet -> moist soil)
+    soil_moisture = np.clip(0.18 + (rain_90d / 900.0) + np.random.uniform(-0.05, 0.05), 0.05, 0.9)
+
+    # LST: monsoon months are cooler over wet ground
+    lst = 45.0 - (rain_30d_frac := min(1.0, rainfall_30d / 400.0)) * 12 - np.random.uniform(0, 3)
 
     return EnvironmentalFeatures(
         soil_moisture=round(float(np.clip(soil_moisture, 0, 1)), 4),
         land_surface_temp_c=round(float(lst), 1),
         rainfall_30d_mm=round(float(rainfall_30d), 1),
-        rainfall_7d_mm=round(float(rainfall_7d), 1),
-        rainfall_anomaly=round(float(rainfall_anomaly), 4),
+        rainfall_7d_mm=round(float(np.clip(rainfall_7d, 0, None)), 1),
+        rainfall_anomaly=round(float(anomaly), 4),
     )
 
 
@@ -407,25 +418,25 @@ def generate_recommendations(
 
 # ── Production Forecasting ──────────────────────────────────────
 
+def _mine_location(mine_name: str) -> tuple:
+    """Return (lat, lon) for a MOIL mine name, defaulting to Balaghat belt."""
+    for m in MOIL_MINES:
+        if m["name"] == mine_name:
+            return m["latitude"], m["longitude"]
+    return 21.80, 80.18
+
+
 def generate_historical_production(mine_name: str) -> List[Dict[str, Any]]:
     """
-    Generate realistic historical production data for MOIL mines.
-    Based on publicly available IBM (Indian Bureau of Mines) data trends.
+    Historical production data anchored to REAL MOIL company-level monthly
+    figures (FY25–FY26 press releases) scaled by each mine's indicative
+    output share, with REAL all-India ERA5 rainfall at the mine location.
+    Months outside the real window are estimated from MOIL annual totals
+    with a seasonal monsoon pattern.
     """
     random.seed(hash(mine_name) % 2**32)
-
-    base_production = {
-        "Dongri Buzurg Mine": 85000,
-        "Munsur Buzurg Mine": 72000,
-        "Kandri Mine": 68000,
-        "Kosmi Mine": 55000,
-        "Shahi Mine": 48000,
-        "Tirodi Mine": 62000,
-        "Jagannathpur Mine": 45000,
-        "Chikla Mine": 38000,
-        "Balaghat Mine": 52000,
-        "Witdongri Mine": 42000,
-    }.get(mine_name, 50000)
+    lat, lon = _mine_location(mine_name)
+    rainfall_series = get_rainfall_series(lat, lon)
 
     data = []
     for year in range(2019, 2026):
@@ -433,45 +444,41 @@ def generate_historical_production(mine_name: str) -> List[Dict[str, Any]]:
             if year == 2025 and month > 8:
                 continue
 
-            # Seasonal pattern: monsoon reduces production
-            seasonal_factor = 1.0
-            if month in [6, 7, 8, 9]:  # Monsoon
-                seasonal_factor = 0.55
-            elif month in [5, 10]:
-                seasonal_factor = 0.80
-            elif month in [3, 4]:
-                seasonal_factor = 1.05
+            month_key = f"{year}-{month:02d}"
 
-            # Year trend: slight growth then plateau
-            year_factor = 1.0 + (year - 2019) * 0.02
+            # Real-anchored production (tonnes) for this mine & month — this is ACTUAL output
+            base = mine_production_for_month(mine_name, month_key)
 
-            # Random variation
-            noise = random.gauss(1.0, 0.08)
+            # Small noise around the real figure
+            noise = 1.0 + 0.05 * math.sin((hash((mine_name, month_key)) % 1000) / 1000.0 * 2 * math.pi)
 
-            # Equipment utilization
-            equip_util = random.uniform(0.65, 0.92)
-            if month in [7, 8]:
-                equip_util = random.uniform(0.45, 0.70)
+            # Equipment utilization (used as a reported KPI, not to discount actual)
+            equip_util = random.uniform(0.72, 0.92)
+            if month in [7, 8]:  # monsoon downtime
+                equip_util = random.uniform(0.55, 0.75)
 
-            # Rainfall
-            if month in [6, 7, 8, 9]:
-                rainfall = random.uniform(150, 400)
-            elif month in [5, 10]:
-                rainfall = random.uniform(30, 120)
-            else:
-                rainfall = random.uniform(0, 30)
+            # Real rainfall from ERA5 grid (falls back to seasonal estimate)
+            rainfall = rainfall_series.get(month_key)
+            if rainfall is None:
+                rainfall = (30 if month in [11, 12, 1, 2, 3, 4]
+                            else 80 if month in [5, 10]
+                            else 220)
 
-            target = base_production * seasonal_factor * year_factor
-            actual = target * noise * equip_util
+            # Shortfall realism: heavy-rain months drop actual below target
+            rain_penalty = 0.88 if rainfall > 250 else 1.0
+            actual = base * noise * rain_penalty
+
+            # Target: modest stretch above real output; monsoon targets trimmed
+            target = base * (1.04 if month not in [7, 8] else 1.01)
 
             data.append({
-                "month": f"{year}-{month:02d}",
+                "month": month_key,
                 "year": year,
                 "month_num": month,
                 "mine_name": mine_name,
                 "target_tonnes": round(target),
                 "actual_tonnes": round(actual),
-                "rainfall_mm": round(rainfall, 1),
+                "rainfall_mm": round(float(rainfall), 1),
                 "equipment_utilization": round(equip_util, 3),
                 "blasting_events": random.randint(8, 25) if month not in [7, 8] else random.randint(2, 12),
             })

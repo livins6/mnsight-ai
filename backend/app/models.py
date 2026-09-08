@@ -76,6 +76,7 @@ class GeologicalFeatures(BaseModel):
     distance_to_fault_km: float = Field(..., description="Distance to nearest fault/lineament in km")
     lithology_score: float = Field(..., ge=0, le=1, description="Lithological compatibility score")
     mn_occurrence_count_10km: int = Field(..., description="Number of Mn occurrences within 10km")
+    district: Optional[str] = Field(default=None, description="District name from nearest occurrence")
 
 
 class ProspectivityResult(BaseModel):

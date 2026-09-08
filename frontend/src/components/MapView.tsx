@@ -18,14 +18,17 @@ interface MapViewProps {
   selectedLocation?: { lat: number; lon: number } | null;
   prospectivityLayer?: Array<{ lat: number; lon: number; score: number; confidence: number }>;
   drillCandidates?: Array<{ latitude: number; longitude: number; rank: number; score: number }>;
+  flyToTarget?: { lat: number; lon: number; zoom?: number } | null;
 }
 
 const MnIcon = L.divIcon({
   className: 'custom-marker mn-marker',
   html: `<div style="
     width: 14px; height: 14px; border-radius: 50%;
-    background: #8B4513; border: 2px solid #fff;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    background: radial-gradient(circle at 35% 35%, #b5651d, #8B4513 60%);
+    border: 2px solid rgba(255,255,255,0.9);
+    box-shadow: 0 0 12px rgba(139,69,19,0.9), 0 2px 6px rgba(0,0,0,0.5);
+    animation: pulse-dot 2.4s ease-in-out infinite;
   "></div>`,
   iconSize: [14, 14],
   iconAnchor: [7, 7],
@@ -34,40 +37,45 @@ const MnIcon = L.divIcon({
 const MineIcon = L.divIcon({
   className: 'custom-marker mine-marker',
   html: `<div style="
-    width: 16px; height: 16px; border-radius: 3px;
-    background: #FFD700; border: 2px solid #000;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.5);
+    width: 17px; height: 17px; border-radius: 4px;
+    background: linear-gradient(135deg, #ffd700, #ffa000);
+    border: 2px solid rgba(0,0,0,0.7);
+    box-shadow: 0 0 14px rgba(255,215,0,0.8), 0 2px 6px rgba(0,0,0,0.5);
+    animation: pulse-dot 2s ease-in-out infinite;
   "></div>`,
-  iconSize: [16, 16],
+  iconSize: [17, 17],
   iconAnchor: [8, 8],
 });
 
 const SelectedIcon = L.divIcon({
   className: 'custom-marker selected-marker',
   html: `<div style="
-    width: 20px; height: 20px; border-radius: 50%;
-    background: #ff4444; border: 3px solid #fff;
-    box-shadow: 0 0 10px rgba(255,68,68,0.6);
-    animation: pulse 1.5s infinite;
+    width: 22px; height: 22px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #ff7a7a, #ff4444 60%);
+    border: 3px solid #fff;
+    box-shadow: 0 0 18px rgba(255,68,68,0.9);
+    animation: pulse-dot 1.2s ease-in-out infinite;
   "></div>`,
-  iconSize: [20, 20],
-  iconAnchor: [10, 10],
+  iconSize: [22, 22],
+  iconAnchor: [11, 11],
 });
 
 const DrillIcon = L.divIcon({
   className: 'custom-marker drill-marker',
   html: `<div style="
-    width: 12px; height: 12px; border-radius: 50%;
-    background: #00ff88; border: 2px solid #006633;
-    box-shadow: 0 0 8px rgba(0,255,136,0.5);
+    width: 13px; height: 13px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #7dffb0, #00ff88 60%);
+    border: 2px solid #006633;
+    box-shadow: 0 0 14px rgba(0,255,136,0.9);
+    animation: pulse-dot 1.6s ease-in-out infinite;
   "></div>`,
-  iconSize: [12, 12],
+  iconSize: [13, 13],
   iconAnchor: [6, 6],
 });
 
 export default function MapView({
   occurrences, mines, onLocationClick, selectedLocation,
-  prospectivityLayer = [], drillCandidates = [],
+  prospectivityLayer = [], drillCandidates = [], flyToTarget = null,
 }: MapViewProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
@@ -121,10 +129,10 @@ export default function MapView({
     }, {}, { position: 'topright' }).addTo(map);
 
     // Scale control
-    L.control.scale({ imperial: false }).addTo(map);
+    (L.control as any).scale({ imperial: false }).addTo(map);
 
     // Coordinate display
-    const coordControl = L.control({ position: 'bottomleft' });
+    const coordControl = (L.control as any)({ position: 'bottomleft' });
     coordControl.onAdd = function () {
       const div = L.DomUtil.create('div', 'coord-display');
       div.style.cssText = 'background:rgba(0,0,0,0.7);color:#fff;padding:4px 8px;border-radius:4px;font:12px monospace;';
@@ -140,6 +148,14 @@ export default function MapView({
       onLocationClick(e.latlng.lat, e.latlng.lng);
     });
 
+    // Dynamic radar sweep overlay (subtle animated gradient)
+    const radarOverlay = L.layerGroup().addTo(map);
+    const radarDiv = L.DomUtil.create('div', 'radar-sweep');
+    radarDiv.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:400;' +
+      'background:radial-gradient(circle at 50% 50%, rgba(255,152,0,0.05), transparent 60%);' +
+      'animation:orb-drift 12s ease-in-out infinite;';
+    map.getContainer().appendChild(radarDiv);
+
     // Layer groups
     const mnLayer = L.layerGroup().addTo(map);
     const mineLayer = L.layerGroup().addTo(map);
@@ -150,11 +166,31 @@ export default function MapView({
     mapInstanceRef.current = map;
     layersRef.current = { mnLayer, mineLayer, selectedLayer, prospectivityLayer: prospectivityLG, drillLayer: drillLG };
 
+    // Keep the map correct when its container resizes (side panel opens/closes)
+    let resizeTimer: ReturnType<typeof setTimeout>;
+    const resizeObserver = new ResizeObserver(() => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        map.invalidateSize();
+      }, 250);
+    });
+    resizeObserver.observe(map.getContainer());
+
     return () => {
+      resizeObserver.disconnect();
+      clearTimeout(resizeTimer);
+      if (radarDiv.parentNode) radarDiv.parentNode.removeChild(radarDiv);
       map.remove();
       mapInstanceRef.current = null;
     };
   }, []);
+
+  // Fly to a target location when requested (search box)
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map || !flyToTarget) return;
+    map.flyTo([flyToTarget.lat, flyToTarget.lon], flyToTarget.zoom ?? 13, { duration: 1.2 });
+  }, [flyToTarget]);
 
   // Update manganese occurrences
   useEffect(() => {
@@ -226,7 +262,7 @@ export default function MapView({
     if (!layers) return;
 
     layers.prospectivityLayer.clearLayers();
-    prospectivityLayer.forEach((cell) => {
+    prospectivityLayer.forEach((cell, i) => {
       // Color: green (high) → yellow (mid) → red (low)
       const score = cell.score;
       const r = score < 0.5 ? 255 : Math.round(255 * (1 - score));
@@ -240,6 +276,7 @@ export default function MapView({
           weight: 0.5,
           fillColor: color,
           fillOpacity: 0.3,
+          className: `prospectivity-cell cell-${i % 8}`,
         }
       );
       rect.bindPopup(`

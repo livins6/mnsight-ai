@@ -5,3 +5,6 @@ __pycache__/
 tmp/
 .vite/
 *.log
+*.log.err
+dist/
+*.tsbuildinfo
